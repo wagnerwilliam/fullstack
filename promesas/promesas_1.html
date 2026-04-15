@@ -7,5 +7,25 @@
 </head>
 <body>
         
+    <script>
+
+        function prueba() {
+            return new Promise(callback => {
+                // una vez esta funcion termine su trabajo
+                
+                setTimeout(() => {
+                    callback("valor de la promesa")
+                }, 2000)
+            })
+        }
+
+        prueba().then(value => {
+            console.log(value);
+            
+        })
+        
+
+    </script>
+
 </body>
 </html>
