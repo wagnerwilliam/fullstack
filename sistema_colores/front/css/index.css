@@ -9,6 +9,7 @@ body {
 
 form {
     position: fixed;
+    z-index: 1;
     left: 0;
     top: 200px;
     background-color: white;
@@ -92,6 +93,7 @@ li button:nth-child(3) {
 .modal-editar {
     display: none;
     position: fixed;
+    z-index: 2;
     top: 0;
     left: 0;
     /* safari */
