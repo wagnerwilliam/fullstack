@@ -4,6 +4,8 @@ export function leerColores() {
     return new Promise((ok, ko) => {
         readFile("./colores.json", (error, data) => {
             if (!error) {
+                // se usa JSON.parse Porque readFile NO devuelve objetos, devuelve texto (string o buffer).
+                // entonces JSON.parse convierte ese texto JSON en un objeto real de JavaScript:
                 let colores = JSON.parse(data.toString());
                 return ok(colores);
             }
@@ -63,7 +65,7 @@ export function borrarColor(id) {
     return new Promise((ok, ko) => {
         leerColores()
         .then(colores => {
-            colores = colores.filter( color => color.id != id); // elemento que retone true se queda el que no sale pero siempre retorna aray
+            colores = colores.filter( color => color.id != id); // elemento que retorna true se queda false sale pero siempre retorna aray
 
             writeFile("./colores.json", JSON.stringify(colores), error => {
                 if (!error) {

@@ -11,6 +11,7 @@ const previewColor = document.querySelector(".color");
 const inputsEditor = document.querySelectorAll(".modal-editar input");
 
 let colorBorrar = null;
+let idColor = null
 // colores a editar.
 let colorEditar = null;
 
@@ -20,7 +21,6 @@ function color({ id, r, g, b }) {
     let valor = rgb.join(",");
 
     li.style.backgroundColor = `rgb(${valor})`;
-    li.setAttribute("data-id", id)
     li.innerHTML = `
         <span>${valor}</span>
         <button>editar</button>
@@ -40,7 +40,8 @@ function color({ id, r, g, b }) {
     // borrar
     li.querySelector("button:nth-child(3)").addEventListener("click", () => {
         // captura globalmente el elemento que se va a borrar.
-        colorBorrar = li;
+        //colorBorrar = li;
+        idColor = id;
         modlBorrar.classList.toggle("modal-visible")
 
     });
@@ -50,25 +51,25 @@ function color({ id, r, g, b }) {
 
 // carga inicial de los datos, peticiones fetch al backend.
 fetch("/colores")
-.then(response => response.json())
-.then(colores => {
-    colores.forEach(c => {
-        ul.appendChild(color(c))
+    .then(response => response.json())
+    .then(colores => {
+        colores.forEach(c => {
+            ul.appendChild(color(c))
+        });
     });
-});
 
 
 
 form.addEventListener("submit", e => {
     e.preventDefault();
     //TODO: validar input
-    let [ r, g, b ] = inputText.value.split(",");
+    let [r, g, b] = inputText.value.split(",");
 
     let objColor = {
         //id: Math.random() * 3000,
         r, g, b
     }
-    
+
     fetch("/nuevo", {
         method: "POST",
         body: JSON.stringify(objColor),
@@ -76,13 +77,13 @@ form.addEventListener("submit", e => {
             "Content-type": "application/json"
         }
     })
-    .then(response => response.json())
-    .then(({id}) => {
-        objColor.id = id;
-        ul.appendChild(color(objColor))
-        inputText.value = "";
-    });
-    
+        .then(response => response.json())
+        .then(({ id }) => {
+            objColor.id = id;
+            ul.appendChild(color(objColor))
+            inputText.value = "";
+        });
+
 
 });
 
@@ -93,8 +94,20 @@ botonesModalBorrar.forEach((boton, i) => {
             colorBorrar = null;
             modlBorrar.classList.toggle("modal-visible")
         } else {
-            colorBorrar.remove();
-            colorBorrar = null;
+            console.log(idColor);
+            //se apunta al endpoint para eliminar color.
+            fetch(`/eliminar/${idColor}`, {
+                method: "DELETE",
+                headers: {
+                    "Conten-type": "application/json"
+                }
+            })
+                .then(response => response.json())
+                .then(response => {
+                    console.log(response);
+                })
+            //colorBorrar.remove();
+            idColor = null;
             modlBorrar.classList.toggle("modal-visible")
         }
     });
