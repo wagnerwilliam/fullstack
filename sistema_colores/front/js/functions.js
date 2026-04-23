@@ -32,7 +32,6 @@ function color({ id, r, g, b }) {
         //se agrega objeto item li a editar y rgb valores de cada input range global
         colorEditar = { item: li, rgb };
 
-        console.log(colorEditar);
         previewColor.style.backgroundColor = `rgb(${rgb.join(",")})`;
         colorEditar.rgb.forEach((valor, i) => inputsEditor[i].value = valor)
         modalEditar.classList.toggle("modal-visible");
@@ -49,6 +48,16 @@ function color({ id, r, g, b }) {
     return li
 }
 
+// carga inicial de los datos, peticiones fetch al backend.
+fetch("/colores")
+.then(response => response.json())
+.then(colores => {
+    colores.forEach(c => {
+        ul.appendChild(color(c))
+    });
+});
+
+
 
 form.addEventListener("submit", e => {
     e.preventDefault();
@@ -56,13 +65,24 @@ form.addEventListener("submit", e => {
     let [ r, g, b ] = inputText.value.split(",");
 
     let objColor = {
-        id: Math.random() * 3000,
+        //id: Math.random() * 3000,
         r, g, b
     }
     
-    ul.appendChild(color(objColor))
-
-    inputText.value = "";
+    fetch("/nuevo", {
+        method: "POST",
+        body: JSON.stringify(objColor),
+        headers: {
+            "Content-type": "application/json"
+        }
+    })
+    .then(response => response.json())
+    .then(({id}) => {
+        objColor.id = id;
+        ul.appendChild(color(objColor))
+        inputText.value = "";
+    });
+    
 
 });
 
@@ -80,6 +100,7 @@ botonesModalBorrar.forEach((boton, i) => {
     });
 });
 
+// recorre modal de nodos de botones para editar.
 botonesModalEditar.forEach((boton, i) => {
     boton.addEventListener("click", () => {
         if (i == 0) {
@@ -97,7 +118,7 @@ botonesModalEditar.forEach((boton, i) => {
 
 inputsEditor.forEach((input, i) => {
     input.addEventListener("input", () => {
-        //actualiza los valores del rgb ya que se esta usando l;a referencia de variables globales.
+        //actualiza los valores del rgb ya que se esta usando la referencia de variables globales.
         colorEditar.rgb[i] = input.value
         previewColor.style.backgroundColor = `rgb(${colorEditar.rgb.join(",")})`;
     });
