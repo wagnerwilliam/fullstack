@@ -34,6 +34,20 @@ server.post("/nuevo", async (request, response) => {
     }
 });
 
+// endpoint actualizar color
+server.patch("/editar/:id", async (request, response) => {
+    try {
+        let id = request.params.id;
+        let data = request.body;
+        let newColor = await actualizarColor(id, data);
+        response.status(204)
+        response.json({ message: "color actualizao", color: newColor })
+    } catch (error) {
+        response.status(500);
+        response.json({ error: "error en el servidor" });
+    }
+});
+
 
 // endpoint borrar color
 server.delete("/eliminar/:id", async (request, response) => {

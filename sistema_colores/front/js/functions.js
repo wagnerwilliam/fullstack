@@ -34,6 +34,7 @@ function color({ id, r, g, b }) {
 
         previewColor.style.backgroundColor = `rgb(${rgb.join(",")})`;
         colorEditar.rgb.forEach((valor, i) => inputsEditor[i].value = valor)
+        idColor = id;
         modalEditar.classList.toggle("modal-visible");
     });
 
@@ -94,7 +95,6 @@ botonesModalBorrar.forEach((boton, i) => {
             colorBorrar = null;
             modlBorrar.classList.toggle("modal-visible")
         } else {
-            console.log(idColor);
             //se apunta al endpoint para eliminar color.
             fetch(`/eliminar/${idColor}`, {
                 method: "DELETE",
@@ -121,9 +121,27 @@ botonesModalEditar.forEach((boton, i) => {
             modalEditar.classList.remove("modal-visible")
         } else {
             //opcion de guardar al editar.
-            colorEditar.item.style.backgroundColor = `rgb(${colorEditar.rgb.join(",")})`;
-            colorEditar.item.children[0].innerText = colorEditar.rgb.join(",");
-            colorEditar = null;
+            // colorEditar.item.style.backgroundColor = `rgb(${colorEditar.rgb.join(",")})`;
+            // colorEditar.item.children[0].innerText = colorEditar.rgb.join(",");
+            // colorEditar = null;
+            //falta actualziar pagina al recibir la peticion.
+            let objActuializar = {
+                r: colorEditar.rgb[0],
+                g: colorEditar.rgb[1],
+                b: colorEditar.rgb[2]
+            }
+            fetch(`/editar/${idColor}`, {
+                method: "PATCH",
+                body: JSON.stringify(objActuializar),
+                headers: {
+                    "Content-type": "application/json"
+                }
+
+            })
+            .then(response => response.json())
+            .then(response => {
+
+            });
             modalEditar.classList.remove("modal-visible");
         }
     });
