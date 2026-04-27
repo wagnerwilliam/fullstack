@@ -69,7 +69,7 @@ export function borrarColor(id) {
 
             writeFile("./colores.json", JSON.stringify(colores), error => {
                 if (!error) {
-                    return ok(id)
+                    return ok();
                 }
                 ko();
             });

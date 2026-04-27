@@ -8,7 +8,6 @@ server.use(express.json());
 server.use(express.static("./front"));
 
 
-
 // apis
 server.get("/colores", async (request, response) => {
     try {
@@ -35,13 +34,10 @@ server.post("/nuevo", async (request, response) => {
 });
 
 // endpoint actualizar color
-server.patch("/editar/:id", async (request, response) => {
+server.put("/actualizar/:id", async (request, response) => {
     try {
-        let id = request.params.id;
-        let data = request.body;
-        let newColor = await actualizarColor(id, data);
-        response.status(204)
-        response.json({ message: "color actualizao", color: newColor })
+        await actualizarColor(Number(request.params.id), request.body);
+        response.sendStatus(204);
     } catch (error) {
         response.status(500);
         response.json({ error: "error en el servidor" });
@@ -50,11 +46,11 @@ server.patch("/editar/:id", async (request, response) => {
 
 
 // endpoint borrar color
-server.delete("/eliminar/:id", async (request, response) => {
+server.delete("/borrar/:id", async (request, response) => {
     try {
         // elimina color desde la bd (prueba con archivo json)
-        let id = await borrarColor(request.params.id)
-        response.json({ message: `Color eliminardo: ${id}` })
+        await borrarColor(Number(request.params.id));
+        response.sendStatus(204); // no content
 
     } catch (error) {
         response.status(500);
