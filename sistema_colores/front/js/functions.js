@@ -2,6 +2,7 @@
 const ul = document.querySelector("ul");
 const form = document.querySelector("form");
 const inputText = document.querySelector("input[type=text]");
+const msgError = document.querySelector(".error");
 const modlBorrar = document.querySelector(".modal-borrar");
 const modalEditar = document.querySelector(".modal-editar");
 const botonesModalBorrar = document.querySelectorAll(".modal-borrar button");
@@ -63,27 +64,53 @@ fetch("/colores")
 form.addEventListener("submit", e => {
     e.preventDefault();
     //TODO: validar input
-    let [r, g, b] = inputText.value.split(",");
+    msgError.classList.remove("visible");
 
-    let objColor = {
-        //id: Math.random() * 3000,
-        r, g, b
-    }
+    if (/^(\d{1,3},){2}\d{1,3}$/.test(inputText.value)) {
 
-    fetch("/nuevo", {
-        method: "POST",
-        body: JSON.stringify(objColor),
-        headers: {
-            "Content-type": "application/json"
+        let valores = inputText.value.split(",").map(n => Number(n));
+        let i = 0;
+        let valido = true;
+
+        // 234,12,89
+        while (valido && i < valores.length) {
+            valido = valores[i] <= 255;
+            i++;
         }
-    })
-        .then(response => response.json())
-        .then(({ id }) => {
-            objColor.id = id;
-            ul.appendChild(color(objColor))
-            inputText.value = "";
-        });
 
+        if (valido) {
+            let [r, g, b] = valores;
+
+            let objColor = {
+                //id: Math.random() * 3000,
+                r, g, b
+            }
+
+            return fetch("/nuevo", {
+                method: "POST",
+                body: JSON.stringify(objColor),
+                headers: {
+                    "Content-type": "application/json"
+                }
+            })
+            .then(response => {
+                if (response.status == 201){
+                    return response.json();
+                }
+                throw "la peticion falló";
+            })
+            .then(({ id }) => {
+                objColor.id = id;
+                ul.appendChild(color(objColor))
+                inputText.value = "";
+            })
+            .catch(error => {
+                console.log(error);
+            });
+        }
+    }
+    
+    msgError.classList.add("visible");
 
 });
 

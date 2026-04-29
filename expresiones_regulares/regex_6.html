@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+
+        .bien {
+            outline: 5px solid #0c0;
+        }
+
+        .mal {
+            outline: 5px solid #c00;
+        }
+
+
+    </style>
+</head>
+<body>
+    <input type="text">
+    <script>
+
+        const input = document.querySelector("input");
+        const regex = /^[A-ZÂÉIÍÓÚÑ][a-záéíóúñ]* [A-ZÂÉIÍÓÚÑ][a-záéíóúñ]*$/;
+        /**
+         * Nombre Apellido
+         * N apellido
+         * Nombre A
+         * N A
+         */
+        input.addEventListener("input", () => {
+            input.classList.remove("bien", "mal");
+
+            input.classList.add( regex.test(input.value) ? "bien" : "mal" );
+        });
+
+    </script>
+</body>
+</html>

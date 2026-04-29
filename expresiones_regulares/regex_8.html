@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<style>
+
+    .resaltado {
+        background-color: yellow;
+        font-weight: bold;
+    }
+
+</style>
+
+<body>
+    <input type="text">
+    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur quae cumque sequi tempore fugit distinctio ad
+        quas eos nobis fugiat at possimus voluptate ex excepturi itaque, natus error iste vero.</p>
+
+    
+    <script>
+
+        const p = document.querySelector("p");
+        const input = document.querySelector("input");
+        const txtOriginal = p.innerText;
+
+        input.addEventListener("input", () => {
+            
+            let regex = new RegExp(input.value, "ig");
+            p.innerHTML = txtOriginal.replace(regex, match => {
+                return `<span class="resaltado">${match}</span>`
+            });
+
+        });
+
+
+    </script>
+
+</body>
+
+</html>
