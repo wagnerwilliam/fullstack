@@ -1,0 +1,12 @@
+GET http://localhost:4000/colores
+
+###
+
+POST http://localhost:4000/nuevo
+Content-Type: application/json
+
+{
+    "r": 256,
+    "g": 0,
+    "b": 100
+}

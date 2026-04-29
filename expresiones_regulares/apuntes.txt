@@ -1,0 +1,72 @@
+deberes para el lunes ---> generar un par de ideas para el posible proyecto final
+
+
+parámetros dinámicos en la URL ----> :
+
+/algo/:hola
+
+/algo/1 --> hola --> 1
+
+/algo/blablabla hola ---> blablabla
+
+los parámetros se alamacenan en el objeto PARAMS de la petición 
+
+/algo/:hola
+
+/algo/1 --> peticion.params --> { algo : 1 }
+
+expresiones regulares ------> regex --> patrones que definen la estructura de un string
+
+- match --> retorna un array con el match 
+- test
+
+/regex/
+
+flags ---> /regex/flags ---> g (global) i (case insensitive)
+
+^ ---> indica el inicio del input de la entrada
+$ ---> representa fin del input
+
+conjuntos ----> [] --> representan UN SOLO CARACTER, que puede ser cualquiera de los del conjunto, ejemplo -> [auk] 
+conjuntos negativos --> [^] --> representan UN SOLO CARACTER, que puede ser cualquiera MENOS los del conjunto [^auk]
+en los conjuntos podemos usar RANGOS
+[0123456789]
+[0-9] --> del cero al 9 INCLUSIVE
+[a-z] --> de la a a la z en minusculas sin diacriticos
+[A-Z] --> de la a a la z en mayusculas sin diacriticos
+
+caracteres modificadores ---> ? + * ---> afectan al caracter precendente 
+? --> opcional
++ ---> una o más veces
+* ----> indica que el caracter es opcional pero en caso de estar puede estar mas de una vez.
+a+
+[ar]+
+
+repetición de caracteres --> {} ---> afecta al caracter precendente 
+{n} {min,max} {min,}
+
+
+caracteres escapados ----> \ ---> activa/desactiva la funcionalidad/significado de un caracter 
+\t --> tabulador
+\n --> nueva línea 
+\r --> return
+\s --> espacio 
+\d --> dígito (0-9)
+\b ---> boundary ---> límite --> principio o fin del input o un caracter invisible
+
+wildcard ---> . representa calquier caracter
+
+OR ---> |
+
+grupos indexados ----> ()
+para hacer referencia a un indice ---> \indice
+
+pagina opara estudiar regex ---> https://regexr.com/
+
+--------------------------------------
+ej js todos los metodos de string que reciben otro string como argumento, el argumento no es string signo una REGEX
+
+string.replace(regex, sustituto)
+string.replace(regex, callback) ---> el callback recibe un argumento el match y lo sustituye por lo que retorne el callback
+
+---------------------------------------------
