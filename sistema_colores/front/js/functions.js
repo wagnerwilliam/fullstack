@@ -16,38 +16,83 @@ let idColor = null
 // colores a editar.
 let colorEditar = null;
 
-function color({ id, r, g, b }) {
-    let rgb = [r, g, b];
-    let li = document.createElement("li");
-    let valor = rgb.join(",");
+// function color({ id, r, g, b }) {
+//     let rgb = [r, g, b];
+//     let li = document.createElement("li");
+//     let valor = rgb.join(",");
 
-    li.style.backgroundColor = `rgb(${valor})`;
-    li.innerHTML = `
-        <span>${valor}</span>
-        <button>editar</button>
-        <button>borrar</button>
-    `;
+//     li.style.backgroundColor = `rgb(${valor})`;
+//     li.innerHTML = `
+//         <span>${valor}</span>
+//         <button>editar</button>
+//         <button>borrar</button>
+//     `;
 
-    // editar
-    li.querySelector("button:nth-child(2)").addEventListener("click", () => {
-        //se agrega objeto item li a editar y rgb valores de cada input range global
-        colorEditar = { item: li, rgb, id };
+//     // editar
+//     li.querySelector("button:nth-child(2)").addEventListener("click", () => {
+//         //se agrega objeto item li a editar y rgb valores de cada input range global
+//         colorEditar = { item: li, rgb, id };
 
-        previewColor.style.backgroundColor = `rgb(${rgb.join(",")})`;
-        colorEditar.rgb.forEach((valor, i) => inputsEditor[i].value = valor)
-        idColor = id;
-        modalEditar.classList.toggle("modal-visible");
-    });
+//         previewColor.style.backgroundColor = `rgb(${rgb.join(",")})`;
+//         colorEditar.rgb.forEach((valor, i) => inputsEditor[i].value = valor)
+//         idColor = id;
+//         modalEditar.classList.toggle("modal-visible");
+//     });
 
-    // borrar
-    li.querySelector("button:nth-child(3)").addEventListener("click", () => {
-        // captura globalmente el elemento que se va a borrar.
-        colorBorrar = { item: li, id };
-        modlBorrar.classList.toggle("modal-visible")
+//     // borrar
+//     li.querySelector("button:nth-child(3)").addEventListener("click", () => {
+//         // captura globalmente el elemento que se va a borrar.
+//         colorBorrar = { item: li, id };
+//         modlBorrar.classList.toggle("modal-visible")
 
-    });
+//     });
 
-    return li
+//     return li
+// }
+
+class Color {
+    constructor({ r, g, b, _id }, contenedor){
+        this.id = _id;
+        // analizar r y g llegan como cadenas revisar esto.
+        this.rgb = [r,g,b];
+        this.DOM = null;
+        this.crearColor(contenedor);
+    }
+
+    crearColor(contenedor){
+        this.DOM = document.createElement("li");
+        let valor = this.rgb.join(",");
+
+        this.DOM.style.backgroundColor = `rgb(${valor})`;
+        this.DOM.innerHTML = `
+            <span>${valor}</span>
+            <button>editar</button>
+            <button>borrar</button>
+        `;
+
+        let botonEditar = this.DOM.querySelector("button:nth-child(2)");
+        let botonEliminar = this.DOM.querySelector("button:nth-child(3)");
+
+        botonEliminar.addEventListener("click", () => {
+            // captura globalmente el elemento que se va a borrar.
+            colorBorrar = this;
+            modlBorrar.classList.toggle("modal-visible")
+
+        });
+
+        // al ediitar que funcione correctamente tratar de hacerlo sin IA
+        botonEditar.addEventListener("click", () => {
+            //se agrega objeto item li a editar y rgb valores de cada input range global
+            colorEditar = this;            
+            console.log(this)
+            previewColor.style.backgroundColor = `rgb(${this.rgb.join(",")})`;
+            this.rgb.forEach((valor, i) => inputsEditor[i].value = valor)
+            modalEditar.classList.toggle("modal-visible");
+        });
+
+        contenedor.appendChild(this.DOM);
+    }
+
 }
 
 // carga inicial de los datos, peticiones fetch al backend.
@@ -55,7 +100,8 @@ fetch("/colores")
     .then(response => response.json())
     .then(colores => {
         colores.forEach(c => {
-            ul.appendChild(color(c))
+            //ul.appendChild(color(c))
+            new Color(c, ul);
         });
     });
 
@@ -80,12 +126,12 @@ form.addEventListener("submit", e => {
 
         if (valido) {
             let [r, g, b] = valores;
-
+            
             let objColor = {
                 //id: Math.random() * 3000,
                 r, g, b
             }
-
+            
             return fetch("/nuevo", {
                 method: "POST",
                 body: JSON.stringify(objColor),
@@ -99,9 +145,11 @@ form.addEventListener("submit", e => {
                 }
                 throw "la peticion falló";
             })
-            .then(({ id }) => {
-                objColor.id = id;
-                ul.appendChild(color(objColor))
+            .then(({ _id }) => {
+                objColor._id = _id;
+               //ul.appendChild(color(objColor))
+                new Color(objColor, ul);
+
                 inputText.value = "";
             })
             .catch(error => {
@@ -127,7 +175,7 @@ botonesModalBorrar.forEach((boton, i) => {
             })
             .then(response => {
                 if (response.status == 204) {
-                    colorBorrar.item.remove();
+                    colorBorrar.DOM.remove();
                     colorBorrar = null;
                     return modlBorrar.classList.toggle("modal-visible")
                 }
@@ -142,10 +190,11 @@ botonesModalEditar.forEach((boton, i) => {
     boton.addEventListener("click", () => {
         if (i == 0) {
             colorEditar = null;
-            modalEditar.classList.remove("modal-visible")
+            modalEditar.classList.remove("modal-visible");
+
         } else {
             //opcion de guardar al editar.
-            let { r, g, b } = colorEditar.rgb
+            let [ r, g, b ] = colorEditar.rgb
             fetch(`/actualizar/${colorEditar.id}`, {
                 method: "PUT",
                 body: JSON.stringify({r, g, b}),
@@ -154,13 +203,16 @@ botonesModalEditar.forEach((boton, i) => {
                 }
 
             })
-            .then(response => {                
+            .then(response => {
+                
                 if (response.status == 204) {
-                    colorEditar.item.style.backgroundColor = `rgb(${colorEditar.rgb.join(",")})`;
-                    colorEditar.item.children[0].innerText = colorEditar.rgb.join(",");
+                    //revisar al editar numeros los comvierte a str
+                    colorEditar.DOM.style.backgroundColor = `rgb(${colorEditar.rgb.join(",")})`;
+                    colorEditar.DOM.children[0].innerText = colorEditar.rgb.join(",");
                     colorEditar = null;
                     return modalEditar.classList.remove("modal-visible");
                 }
+                
                 console.log("informar al usuario del error");
             });
         }

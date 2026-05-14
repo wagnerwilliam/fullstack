@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        form{
+            padding: 20px;
+        }
+        .cuadros {
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .cuadro {
+            border: 1px solid black;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <form>
+        <input type="text" placeholder="ancho">
+        <input type="text" placeholder="Alto">
+        <input type="submit" value="crear cuadro">
+    </form>
+
+    <section class="cuadros">
+
+    </section>
+
+    <script>
+        const form = document.querySelector("form");
+        const inputs = document.querySelectorAll("input[type='text']");
+        const contenedor = document.querySelector(".cuadros");
+
+        class Cuadro {
+            constructor(ancho, alto, contenedor){
+                this.ancho = ancho
+                this.alto = alto
+                this.DOM = null;
+                this.crearCuadro(contenedor)
+            }
+
+            crearCuadro(contenedor){
+                this.DOM = document.createElement("div");
+                this.DOM.classList.add("cuadro");
+                this.DOM.style.width = this.ancho + "px";
+                this.DOM.style.height = this.alto + "px";
+
+                this.DOM.addEventListener("click", () => {
+                    this.borrarCuadro();
+                });
+
+                contenedor.appendChild(this.DOM);
+            }
+
+            borrarCuadro(){
+                this.DOM.remove();
+            }
+
+        }
+
+        form.addEventListener("submit", e => {
+            e.preventDefault();
+
+            new Cuadro(inputs[0].value, inputs[1].value, contenedor)
+            inputs.forEach(input => input.value = "");
+            
+        });
+
+    </script>
+</body>
+</html>

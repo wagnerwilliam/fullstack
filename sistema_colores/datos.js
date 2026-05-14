@@ -1,79 +1,128 @@
-import { readFile, writeFile } from "fs";
+import dotenv from "dotenv";
+dotenv.config();
+// ------------------------------
+import { MongoClient, ObjectId } from "mongodb";
 
-export function leerColores() {
+
+function connect() {
+    return MongoClient.connect(process.env.MONGO_URL)
+}
+
+// implementar funcion buscar usuario recibe el nombre de usuario y retorna el obj de mongodb
+
+export function buscarUsuario(username){
     return new Promise((ok, ko) => {
-        readFile("./colores.json", (error, data) => {
-            if (!error) {
-                // se usa JSON.parse Porque readFile NO devuelve objetos, devuelve texto (string o buffer).
-                // entonces JSON.parse convierte ese texto JSON en un objeto real de JavaScript:
-                let colores = JSON.parse(data.toString());
-                return ok(colores);
+        let connection = null;
+        connect()
+        .then(connectMongo => {
+            connection = connectMongo;
+            let collection = connection.db("colores").collection("usuarios");
+            return collection.findOne({ username })
+        })
+        .then(response => ok(response))
+        .catch(error => ko(error))
+        .finally(() => {
+            if (connection) {
+                connection.close();
             }
-            ko();
         });
-    });
+    })
 }
 
-export function crearColor(color) { // obj {r, g, b}
+// let response = await buscarUsuario("william_97")
+// console.log(response);
+
+
+export function leerColores(user_id) {
     return new Promise((ok, ko) => {
-        leerColores()
-        .then(colores => {
-            let id = colores.length > 0 ? colores[colores.length - 1].id + 1 : 1;
-            color.id = id;
-            colores.push(color);
-
-            writeFile("./colores.json", JSON.stringify(colores), error => {
-                if (!error) {
-                    return ok(id)
+        let connection = null;
+        connect()
+            .then(connectMongo => {
+                connection = connectMongo;
+                let collection = connection.db("colores").collection("colores");
+                return collection.find({ user_id }).toArray();
+            })
+            .then(colores => ok(colores))
+            .catch(error => ko({ error: "Error en bbdd" }))
+            .finally(() => {
+                if (connection) {
+                    connection.close();
                 }
-                ko();
             });
-        })
-        .catch(() => ko())
+
     });
 }
 
-export function actualizarColor(id, objCambios) {
+export function crearColor(obj) {
     return new Promise((ok, ko) => {
-        leerColores()
-        .then(colores => {
-            colores = colores.map(color => {
-                if (color.id == id) {
-                    let {r,g,b} = objCambios;
+        let connection = null;
+        connect()
+            .then(connectMongo => {
+                connection = connectMongo;
+                let collection = connection.db("colores").collection("colores");
+                return collection.insertOne(obj);
+            })
+            .then(resultado => ok(resultado.insertedId))
+            .catch(error => ko({ error: "Error en bbdd" }))
+            .finally(() => {
+                if (connection) {
+                    connection.close();
+                }
+            });
 
-                    // valida existencia de r g b en el objeto de cambio si es undefined deja el color que ya tenia el objeto en bd.
-                    color.r = r != undefined ? r : color.r;
-                    color.g = g != undefined ? g : color.g;
-                    color.b = b != undefined ? b : color.b;
-                }
-                return color
-            });
-            
-            writeFile("./colores.json", JSON.stringify(colores), error => {
-                if (!error) {
-                    return ok(id)
-                }
-                ko();
-            });
-        })
-        .catch(() => ko())
     });
 }
-//editarColor({r:122, g:33, b: 44}) [{"r":122, "g":33, "b": 44, "id":1}]
+
+// let response = await crearColor({r: 122, g: 33, b: 55, user_id: "6a031ce6794a427fbad7079c"});
+// console.log(response);
+
+// crear funcion boorrar color recibe id | al cumplir la promesa --> 0 | 1
 
 export function borrarColor(id) {
     return new Promise((ok, ko) => {
-        leerColores()
-        .then(colores => {
-            colores = colores.filter( color => color.id != id); // elemento que retorna true se queda false sale pero siempre retorna aray
-
-            writeFile("./colores.json", JSON.stringify(colores), error => {
-                if (!error) {
-                    return ok();
+        let connection;
+        connect()
+            .then(connectMongoo => {
+                connection = connectMongoo;
+                let collection = connection.db("colores").collection("colores");
+                return collection.deleteOne({ _id: new ObjectId(id) })
+            })
+            .then(response => ok(response.deletedCount))
+            .catch(error => ko({ error: "Error en bbdd" })
+            )
+            .finally(() => {
+                if (connection) {
+                    connection.close();
                 }
-                ko();
             });
-        })
-        .catch(() => ko())
+    });
+}
+
+
+// actualizar color recibe y data y obj a actualizar retorna --> { matchedCount, modifiedCount }
+
+
+export function actualizarColor(id, objData) {
+    return new Promise((ok, ko) => {
+        let connection;
+        connect()
+            .then(connectMongoo => {
+                connection = connectMongoo;
+                let collection = connection.db("colores").collection("colores");
+                return collection.updateOne({ _id: new ObjectId(id) }, { $set: objData })
+            })
+            .then(response => ok(
+                { 
+                    "matchedCount": response.matchedCount, 
+                    "modifiedCount": response.modifiedCount 
+                }
+            ))
+            .catch(error => ko({ error: "Error en bbdd" })
+            )
+            .finally(() => {
+                if (connection) {
+                    connection.close();
+                }
+            });
     });
 }
