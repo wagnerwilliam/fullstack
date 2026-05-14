@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <button>petición A</button>
+    <button>petición B</button>
+    <button>obtener TOKEN</button>
+
+    <script>
+
+        const btns = document.querySelectorAll('button')
+        let token = null;
+
+        btns.forEach(btn => {
+            btn.addEventListener("click", async () => {
+                if (btn.innerText == "petición A") {
+                    fetch("/a", {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    })
+                    .then(response => response.text()
+                    .then(response => console.log(response)));
+                }
+    
+                else if (btn.innerText == "petición B") {
+                    let response = await fetch("/b")
+                        console.log(await response.text());
+                }
+
+                else {
+                    let response = await fetch("/login", {
+                        method: "POST",
+                        body: JSON.stringify({nombre: "William"}),
+                        headers: {
+                            "Content-type": "application/json"
+                        }
+                    })
+                    const token = await response.json();
+                    
+                    localStorage.setItem("token", token)
+                }
+            });
+        });
+
+    </script>
+    
+</body>
+</html>

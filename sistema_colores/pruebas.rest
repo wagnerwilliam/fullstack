@@ -1,12 +1,39 @@
 GET http://localhost:4000/colores
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDMxY2U2Nzk0YTQyN2ZiYWQ3MDc5YyIsImlhdCI6MTc3ODc1NDQ4NCwiZXhwIjoxNzc4NzU0Nzg0fQ.07P6iCQICSfujoEpx_ZG6gokfmzK7T6cxQ5eKkOXdOQ
 
 ###
 
 POST http://localhost:4000/nuevo
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMDMxY2U2Nzk0YTQyN2ZiYWQ3MDc5YyIsImlhdCI6MTc3ODc1NDQ4NCwiZXhwIjoxNzc4NzU0Nzg0fQ.07P6iCQICSfujoEpx_ZG6gokfmzK7T6cxQ5eKkOXdOQ
+Content-Type: application/json
+
+
+{
+    "r": 221,
+    "g": 22,
+    "b": 110
+}
+
+#####
+
+DELETE http://localhost:4000/borrar/69f9e0e2dad176160acb1166
+
+
+####
+
+PUT http://localhost:4000/actualizar/69f9e2a1e6937a13a450f381
 Content-Type: application/json
 
 {
-    "r": 256,
-    "g": 0,
-    "b": 100
+    "b": 10
+}
+
+######
+
+POST http://localhost:4000/login
+Content-Type: application/json
+
+{
+    "username": "william_97",
+    "password": "william54321"
 }

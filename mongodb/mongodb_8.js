@@ -1,0 +1,23 @@
+import { MongoClient, ObjectId } from "mongodb";
+
+let colores = [];
+
+for (let i = 0; i < 5; i++) {
+    let [r, g, b] = [0,0,0].map(() => Math.floor(Math.random() * 255));
+    colores.push({r, g, b});
+}
+
+MongoClient.connect('mongodb+srv://wagner:Nerwaliam970619@cluster0.ezbwvfg.mongodb.net/')
+.then( conexion => {
+
+    const coleccion = conexion.db("colores").collection("colores");
+    coleccion.updateOne({ _id : new ObjectId('69f9e28994d77e0facb4550a') }, {$set : { r: 0 , b: 5 } })
+    .then( resultado => {
+        console.log(resultado);
+        conexion.close();
+    });
+})
+.catch(error => {
+    console.log(":/");
+    
+}); //return a promise with connection.
